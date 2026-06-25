@@ -1,0 +1,1 @@
+to record relevant news links & summaries

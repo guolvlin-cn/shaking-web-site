@@ -1,0 +1,1 @@
+to record the shaking pics informations
