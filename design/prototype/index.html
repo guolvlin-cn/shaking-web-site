@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shaking Chloe 谢可寅 — 个人展示站</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #121212;
+      --bg-tertiary: #1a1a1a;
+      --bg-elevated: #1e1e1e;
+      --bg-overlay: rgba(0,0,0,0.85);
+      --bg-glass: rgba(26,26,26,0.8);
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0a0;
+      --text-tertiary: #666666;
+      --text-muted: #4a4a4a;
+      --text-gold: #f5c518;
+      --accent-gold: #f5c518;
+      --accent-gold-hover: #ffd700;
+      --accent-gold-active: #e6b800;
+      --accent-gold-glow: rgba(245,197,24,0.3);
+      --border-default: #2a2a2a;
+      --border-hover: #3a3a3a;
+      --state-error: #ff4d4f;
+      --state-success: #52c41a;
+      --z-navbar: 200;
+      --z-sidebar: 100;
+      --z-modal: 500;
+      --z-lightbox: 700;
+      --z-chatbot: 800;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+    /* ========== TOP NAVBAR ========== */
+    .top-nav {
+      position: fixed; top: 0; left: 0; right: 0; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 32px; z-index: var(--z-navbar);
+      background: transparent;
+      transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
+      border-bottom: 1px solid transparent;
+    }
+    .top-nav.scrolled {
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom-color: var(--border-default);
+    }
+    .nav-left { display: flex; align-items: center; gap: 24px; }
+    .logo {
+      font-size: 20px; font-weight: 700; color: var(--text-primary);
+      text-decoration: none; display: flex; align-items: center; gap: 8px;
+      transition: color 0.3s ease;
+    }
+    .logo:hover { color: var(--accent-gold); }
+    .logo-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--bg-primary);
+    }
+    .page-title {
+      font-size: 16px; font-weight: 600; color: var(--text-primary);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .page-title::before {
+      content: ''; width: 2px; height: 20px; background: var(--accent-gold);
+      border-radius: 1px;
+    }
+    .nav-right { display: flex; align-items: center; gap: 20px; }
+    .search-box {
+      width: 240px; height: 36px; border-radius: 18px;
+      background: var(--bg-tertiary); border: 1px solid var(--border-default);
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .search-box:focus-within {
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 0 3px var(--accent-gold-glow);
+    }
+    .search-box svg { width: 16px; height: 16px; color: var(--text-tertiary); flex-shrink: 0; }
+    .search-box input {
+      background: transparent; border: none; outline: none;
+      color: var(--text-primary); font-size: 14px; width: 100%;
+    }
+    .search-box input::placeholder { color: var(--text-tertiary); }
+    .social-links { display: flex; align-items: center; gap: 16px; }
+    .social-links a {
+      width: 20px; height: 20px; color: var(--text-secondary);
+      transition: color 0.3s ease, transform 0.3s ease;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .social-links a:hover { color: var(--accent-gold); transform: translateY(-2px); }
+
+    /* ========== SIDEBAR ========== */
+    .sidebar {
+      position: fixed; left: 0; top: 64px; width: 200px;
+      height: calc(100vh - 64px); background: var(--bg-secondary);
+      border-right: 1px solid var(--border-default); z-index: var(--z-sidebar);
+      padding: 16px 0; overflow-y: auto;
+      transition: transform 0.3s ease, width 0.3s ease;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      height: 48px; padding: 0 20px; margin: 0 8px;
+      border-radius: 8px; cursor: pointer;
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      transition: all 0.25s ease; position: relative;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.05); color: var(--text-primary);
+    }
+    .nav-item.active {
+      color: var(--accent-gold); background: rgba(245,197,24,0.08);
+    }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+      width: 3px; height: 24px; background: var(--accent-gold); border-radius: 0 2px 2px 0;
+    }
+    .nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ========== MAIN CONTENT ========== */
+    .main-content {
+      margin-left: 200px; margin-top: 64px; min-height: calc(100vh - 64px);
+      padding: 0; background: var(--bg-primary);
+    }
+
+    /* ========== HERO BANNER ========== */
+    .hero {
+      position: relative; width: 100%; height: 100vh;
+      overflow: hidden; display: flex; align-items: center;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #1a0a2e 0%, #0a0a0a 50%, #0f1a0f 100%);
+    }
+    .hero-bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.6) 50%, rgba(10,10,10,0.95) 100%);
+    }
+    .hero-particles {
+      position: absolute; inset: 0; overflow: hidden;
+    }
+    .particle {
+      position: absolute; width: 2px; height: 2px;
+      background: var(--accent-gold); border-radius: 50%;
+      opacity: 0.6; animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+      50% { transform: translateY(-30px) scale(1.5); opacity: 1; }
+    }
+    .hero-content {
+      position: relative; z-index: 10; width: 100%; max-width: 1440px;
+      margin: 0 auto; padding: 0 64px; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    .hero-left {
+      display: flex; flex-direction: column; gap: 16px;
+      max-width: 500px;
+    }
+    .hero-english {
+      font-size: 48px; font-weight: 700; letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--text-primary), var(--accent-gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-chinese {
+      font-size: 24px; font-weight: 500; color: var(--accent-gold);
+    }
+    .hero-tags {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .hero-tag {
+      padding: 6px 16px; border-radius: 20px;
+      background: rgba(245,197,24,0.1); border: 1px solid rgba(245,197,24,0.3);
+      color: var(--accent-gold); font-size: 13px; font-weight: 500;
+    }
+    .hero-cta {
+      margin-top: 8px; display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px; border-radius: 24px;
+      border: 1px solid var(--accent-gold); color: var(--accent-gold);
+      font-size: 14px; font-weight: 600; text-decoration: none;
+      background: transparent; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .hero-cta:hover {
+      background: var(--accent-gold); color: var(--bg-primary);
+      box-shadow: 0 0 30px var(--accent-gold-glow);
+    }
+    .hero-center {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: 420px; height: 560px; border-radius: 20px;
+      background: linear-gradient(135deg, rgba(245,197,24,0.1), rgba(255,215,0,0.05));
+      border: 1px solid rgba(245,197,24,0.2);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-center::before {
+      content: 'SHAKING'; position: absolute; font-size: 120px; font-weight: 700;
+      color: rgba(245,197,24,0.05); letter-spacing: 8px;
+    }
+    .hero-avatar {
+      width: 300px; height: 400px; border-radius: 16px;
+      background: linear-gradient(135deg, #2a1a3a, #1a2a1a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 80px; color: var(--accent-gold); opacity: 0.8;
+    }
+    .hero-right {
+      display: flex; flex-direction: column; gap: 20px; align-items: flex-end;
+    }
+    .quick-jump-item {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--text-secondary); cursor: pointer;
+      transition: all 0.3s ease; text-decoration: none;
+    }
+    .quick-jump-item:hover { color: var(--accent-gold); }
+    .quick-jump-num {
+      font-size: 12px; font-weight: 500; color: var(--accent-gold);
+      width: 24px;
+    }
+    .quick-jump-text { font-size: 14px; }
+    .carousel-dots {
+      position: absolute; left: 32px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 12px; z-index: 20;
+    }
+    .carousel-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255,255,255,0.4); cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .carousel-dot.active {
+      width: 24px; border-radius: 4px; background: var(--accent-gold);
+    }
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: var(--text-tertiary); font-size: 12px;
+      animation: bounce 2s ease-in-out infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ========== SECTION COMMON ========== */
+    .section {
+      max-width: 1440px; margin: 0 auto; padding: 64px 32px;
+    }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-title {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 28px; font-weight: 700; color: var(--text-primary);
+    }
+    .section-title::before {
+      content: ''; width: 2px; height: 24px; background: var(--accent-gold);
+      border-radius: 1px;
+    }
+    .section-more {
+      display: flex; align-items: center; gap: 4px;
+      color: var(--text-secondary); font-size: 14px; text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .section-more:hover { color: var(--accent-gold); }
+
+    /* ========== QUICK ACCESS CARDS ========== */
+    .quick-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+    .quick-card {
+      height: 200px; border-radius: 12px; padding: 24px;
+      background: var(--bg-tertiary); border: 1px solid var(--border-default);
+      display: flex; flex-direction: column; justify-content: space-between;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .quick-card:hover {
+      border-color: var(--accent-gold);
+      background: rgba(245,197,24,0.05);
+      box-shadow: 0 0 20px rgba(245,197,24,0.1);
+    }
+    .quick-card-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(245,197,24,0.1); display: flex;
+      align-items: center; justify-content: center;
+      font-size: 24px; color: var(--accent-gold);
+      transition: all 0.3s ease;
+    }
+    .quick-card:hover .quick-card-icon {
+      background: var(--accent-gold); color: var(--bg-primary);
+    }
+    .quick-card-title { font-size: 18px; font-weight: 600; }
+    .quick-card-desc { font-size: 13px; color: var(--text-secondary); }
+    .quick-card-arrow {
+      align-self: flex-end; color: var(--text-tertiary);
+      transition: all 0.3s ease;
+    }
+    .quick-card:hover .quick-card-arrow {
+      color: var(--accent-gold); transform: translateX(4px);
+    }
+
+    /* ========== WORK CARDS GRID ========== */
+    .works-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    }
+    .work-card {
+      border-radius: 12px; overflow: hidden; cursor: pointer;
+      background: var(--bg-tertiary); border: 1px solid var(--border-default);
+      transition: all 0.3s ease;
+    }
+    .work-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(245,197,24,0.1);
+    }
+    .work-card-img {
+      aspect-ratio: 3/4; background: linear-gradient(135deg, #1a1a2e, #1a2a1a);
+      position: relative; overflow: hidden;
+    }
+    .work-card-img::after {
+      content: attr(data-title); position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 600; color: var(--text-secondary);
+    }
+    .work-card-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.6);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .work-card:hover .work-card-overlay { opacity: 1; }
+    .work-card-overlay-text {
+      padding: 8px 20px; border-radius: 20px;
+      border: 1px solid var(--accent-gold); color: var(--accent-gold);
+      font-size: 13px; font-weight: 500;
+    }
+    .work-card-info { padding: 12px 16px; }
+    .work-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .work-card-meta {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .work-card-tag {
+      padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;
+    }
+    .tag-music { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
+    .tag-movie { background: linear-gradient(135deg, #4834d4, #686de0); color: white; }
+    .tag-stage { background: linear-gradient(135deg, #00d2d3, #01a3a4); color: white; }
+    .tag-variety { background: linear-gradient(135deg, #ff9f43, #feca57); color: white; }
+
+    /* ========== HORIZONTAL SCROLL SECTION ========== */
+    .scroll-section {
+      position: relative;
+    }
+    .scroll-container {
+      display: flex; gap: 16px; overflow-x: auto;
+      scroll-behavior: smooth; scrollbar-width: none;
+      padding-bottom: 8px;
+    }
+    .scroll-container::-webkit-scrollbar { display: none; }
+    .scroll-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); border: 1px solid var(--border-default);
+      color: var(--text-primary); cursor: pointer; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .scroll-arrow:hover {
+      background: rgba(245,197,24,0.2); border-color: var(--accent-gold);
+      color: var(--accent-gold);
+    }
+    .scroll-arrow.prev { left: -20px; }
+    .scroll-arrow.next { right: -20px; }
+    .stage-card {
+      flex-shrink: 0; width: 280px; border-radius: 12px;
+      overflow: hidden; background: var(--bg-tertiary);
+      border: 1px solid var(--border-default); cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .stage-card:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .stage-card-img {
+      height: 360px; background: linear-gradient(135deg, #1a0a1a, #0a1a1a);
+      position: relative;
+    }
+    .stage-card-img::after {
+      content: attr(data-title); position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--text-secondary);
+    }
+    .stage-card-info { padding: 12px 16px; }
+    .stage-card-date { font-size: 12px; color: var(--accent-gold); font-weight: 500; }
+    .stage-card-title { font-size: 14px; font-weight: 600; margin-top: 4px; }
+    .stage-card-venue { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ========== TIMELINE PREVIEW ========== */
+    .timeline-preview {
+      display: flex; align-items: center; justify-content: center; gap: 48px;
+      padding: 40px 0;
+    }
+    .timeline-node {
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .timeline-node:hover { transform: translateY(-4px); }
+    .timeline-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent-gold); position: relative;
+    }
+    .timeline-dot::before {
+      content: ''; position: absolute; inset: -4px;
+      border-radius: 50%; border: 2px solid var(--accent-gold);
+      opacity: 0.3;
+    }
+    .timeline-line {
+      width: 80px; height: 1px; background: var(--border-hover);
+    }
+    .timeline-year { font-size: 14px; font-weight: 600; color: var(--accent-gold); }
+    .timeline-label { font-size: 13px; color: var(--text-secondary); }
+
+    /* ========== FOOTER ========== */
+    .footer {
+      height: 80px; border-top: 1px solid var(--border-default);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-tertiary); font-size: 12px;
+    }
+
+    /* ========== CHATBOT FLOAT ========== */
+    .chatbot-float {
+      position: fixed; right: 24px; bottom: 24px;
+      width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: var(--z-chatbot);
+      box-shadow: 0 4px 20px rgba(245,197,24,0.3);
+      transition: all 0.3s ease;
+    }
+    .chatbot-float:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 30px rgba(245,197,24,0.5);
+    }
+    .chatbot-float svg { width: 24px; height: 24px; color: var(--bg-primary); }
+    .chatbot-window {
+      position: fixed; right: 24px; bottom: 96px;
+      width: 380px; height: 520px; border-radius: 16px;
+      background: var(--bg-secondary); border: 1px solid var(--border-default);
+      z-index: var(--z-chatbot); overflow: hidden;
+      display: flex; flex-direction: column;
+      opacity: 0; transform: translateY(20px) scale(0.95);
+      pointer-events: none; transition: all 0.3s ease;
+    }
+    .chatbot-window.open {
+      opacity: 1; transform: translateY(0) scale(1);
+      pointer-events: all;
+    }
+    .chatbot-header {
+      height: 56px; padding: 0 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .chatbot-header-title {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 15px; font-weight: 600;
+    }
+    .chatbot-status {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--state-success);
+    }
+    .chatbot-close { cursor: pointer; color: var(--text-tertiary); transition: color 0.3s; }
+    .chatbot-close:hover { color: var(--text-primary); }
+    .chatbot-body {
+      flex: 1; overflow-y: auto; padding: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .chatbot-welcome {
+      text-align: center; padding: 20px 0;
+    }
+    .chatbot-welcome-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(245,197,24,0.1); margin: 0 auto 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .chatbot-welcome-title { font-size: 16px; font-weight: 600; }
+    .chatbot-welcome-desc { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .chatbot-quick-btns {
+      display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+      margin-top: 12px;
+    }
+    .chatbot-quick-btn {
+      padding: 6px 14px; border-radius: 16px;
+      background: var(--bg-tertiary); border: 1px solid var(--border-default);
+      color: var(--text-secondary); font-size: 13px; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .chatbot-quick-btn:hover {
+      border-color: var(--accent-gold); color: var(--accent-gold);
+      background: rgba(245,197,24,0.05);
+    }
+    .chatbot-msg { display: flex; gap: 8px; max-width: 85%; }
+    .chatbot-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .chatbot-msg-bubble {
+      padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5;
+    }
+    .chatbot-msg.user .chatbot-msg-bubble {
+      background: var(--accent-gold); color: var(--bg-primary);
+      border-bottom-right-radius: 4px;
+    }
+    .chatbot-msg.ai .chatbot-msg-bubble {
+      background: var(--bg-tertiary); color: var(--text-primary);
+      border-bottom-left-radius: 4px;
+    }
+    .chatbot-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg-elevated); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+    .chatbot-avatar.ai { background: rgba(245,197,24,0.1); color: var(--accent-gold); }
+    .chatbot-input-area {
+      padding: 12px 16px; border-top: 1px solid var(--border-default);
+      display: flex; gap: 8px;
+    }
+    .chatbot-input {
+      flex: 1; height: 40px; border-radius: 20px;
+      background: var(--bg-tertiary); border: 1px solid var(--border-default);
+      padding: 0 16px; color: var(--text-primary); font-size: 14px;
+      outline: none; transition: border-color 0.3s ease;
+    }
+    .chatbot-input:focus { border-color: var(--accent-gold); }
+    .chatbot-send {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--accent-gold); border: none;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.3s ease;
+    }
+    .chatbot-send:hover { background: var(--accent-gold-hover); transform: scale(1.05); }
+    .chatbot-send svg { width: 18px; height: 18px; color: var(--bg-primary); }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); }
+      .main-content { margin-left: 0; }
+      .hero-content { padding: 0 32px; }
+      .hero-center { width: 300px; height: 400px; }
+      .hero-avatar { width: 200px; height: 280px; }
+      .works-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .top-nav { padding: 0 16px; }
+      .search-box { display: none; }
+      .hero-english { font-size: 32px; }
+      .hero-chinese { font-size: 18px; }
+      .hero-center { display: none; }
+      .hero-right { display: none; }
+      .quick-cards { grid-template-columns: 1fr; }
+      .works-grid { grid-template-columns: repeat(2, 1fr); }
+      .section { padding: 40px 16px; }
+      .chatbot-window { width: calc(100vw - 32px); right: 16px; }
+      .timeline-preview { gap: 24px; }
+      .timeline-line { width: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAVBAR -->
+<nav class="top-nav" id="topNav">
+  <div class="nav-left">
+    <a href="#" class="logo">
+      <div class="logo-icon">S</div>
+      <span>Shaking Chloe</span>
+    </a>
+    <div class="page-title">首页</div>
+  </div>
+  <div class="nav-right">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="搜索作品、舞台...">
+    </div>
+    <div class="social-links">
+      <a href="#" title="微博"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.7 18.4c-3.6.4-6.7-1.3-6.9-3.7-.2-2.4 2.6-4.7 6.2-5.1 3.6-.4 6.7 1.3 6.9 3.7.2 2.4-2.6 4.7-6.2 5.1zm8.1-9.5c-.3-.9-1.2-1.5-2.1-1.3-.9.2-1.5 1.1-1.3 2 .2.9 1.1 1.5 2 1.3.9-.2 1.5-1.1 1.4-2zm-1.8-3.2c-.5-1.5-2-2.5-3.6-2.2-1.5.3-2.5 1.8-2.2 3.4.3 1.5 1.8 2.5 3.4 2.2 1.5-.3 2.5-1.8 2.4-3.4z"/></svg></a>
+      <a href="#" title="抖音"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 4.8c-.2-.1-.4-.2-.6-.3-.5-.2-1-.4-1.5-.5-.5-.1-1.1-.2-1.6-.2-.6 0-1.1.1-1.7.2-.5.1-1 .3-1.5.5-.2.1-.4.2-.6.3-.2.1-.4.2-.5.4-.2.1-.3.3-.5.4-.1.2-.3.3-.4.5-.1.2-.2.3-.3.5-.1.2-.2.4-.2.6-.1.2-.1.4-.1.6v8.4c0 .2 0 .4.1.6.1.2.1.4.2.6.1.2.2.4.3.5.1.2.3.3.4.5.1.2.3.3.5.4.2.1.3.3.5.4.2.1.4.2.6.3.2.1.4.2.6.2.2.1.4.1.6.1h.6c.2 0 .4-.1.6-.1.2-.1.4-.1.6-.2.2-.1.4-.2.6-.3.2-.1.4-.2.5-.4.2-.1.3-.3.5-.4.1-.2.3-.3.4-.5.1-.2.2-.4.3-.5.1-.2.2-.4.2-.6.1-.2.1-.4.1-.6V9.6c0-.2 0-.4-.1-.6-.1-.2-.1-.4-.2-.6-.1-.2-.2-.4-.3-.5-.1-.2-.3-.3-.4-.5-.1-.2-.3-.3-.5-.4-.2-.1-.3-.3-.5-.4-.2-.1-.4-.2-.6-.3z"/></svg></a>
+      <a href="#" title="小红书"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/></svg></a>
+    </div>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a href="#" class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>首页</span>
+  </a>
+  <a href="#works" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+    <span>作品合集</span>
+  </a>
+  <a href="#music" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    <span>音乐专区</span>
+  </a>
+  <a href="#movies" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 3v18"/><path d="M3 7h18"/><path d="M3 11h18"/><path d="M3 15h18"/><path d="M3 19h18"/></svg>
+    <span>影视专区</span>
+  </a>
+  <a href="#stage" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>
+    <span>舞台活动</span>
+  </a>
+  <a href="#gallery" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L9 18"/></svg>
+    <span>相册图库</span>
+  </a>
+  <a href="#about" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>关于谢可寅</span>
+  </a>
+  <a href="#chat" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+    <span>问答机器人</span>
+  </a>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- HERO BANNER -->
+  <section class="hero" id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-particles">
+      <div class="particle" style="left:10%;top:20%;animation-delay:0s"></div>
+      <div class="particle" style="left:20%;top:60%;animation-delay:1s"></div>
+      <div class="particle" style="left:30%;top:40%;animation-delay:2s"></div>
+      <div class="particle" style="left:70%;top:30%;animation-delay:0.5s"></div>
+      <div class="particle" style="left:80%;top:70%;animation-delay:1.5s"></div>
+      <div class="particle" style="left:60%;top:50%;animation-delay:2.5s"></div>
+      <div class="particle" style="left:40%;top:80%;animation-delay:3s"></div>
+      <div class="particle" style="left:90%;top:20%;animation-delay:1.2s"></div>
+    </div>
+    <div class="carousel-dots">
+      <div class="carousel-dot active"></div>
+      <div class="carousel-dot"></div>
+      <div class="carousel-dot"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-english">Shaking Chloe</div>
+        <div class="hero-chinese">谢可寅</div>
+        <div class="hero-tags">
+          <span class="hero-tag">歌手</span>
+          <span class="hero-tag">演员</span>
+          <span class="hero-tag">Rapper</span>
+        </div>
+        <a href="#works" class="hero-cta">
+          <span>查看作品</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="hero-center">
+        <div class="hero-avatar">🐯</div>
+      </div>
+      <div class="hero-right">
+        <a href="#works" class="quick-jump-item"><span class="quick-jump-num">01</span><span class="quick-jump-text">最新作品</span></a>
+        <a href="#stage" class="quick-jump-item"><span class="quick-jump-num">02</span><span class="quick-jump-text">热门舞台</span></a>
+        <a href="#timeline" class="quick-jump-item"><span class="quick-jump-num">03</span><span class="quick-jump-text">成长时间线</span></a>
+        <a href="#music" class="quick-jump-item"><span class="quick-jump-num">04</span><span class="quick-jump-text">音乐专区</span></a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>向下滚动</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+    </div>
+  </section>
+
+  <!-- QUICK ACCESS CARDS -->
+  <section class="section" id="quick">
+    <div class="section-header">
+      <div class="section-title">探索更多</div>
+      <a href="#" class="section-more">
+        <span>查看全部</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="quick-cards">
+      <div class="quick-card">
+        <div class="quick-card-icon">🎬</div>
+        <div>
+          <div class="quick-card-title">最新作品</div>
+          <div class="quick-card-desc">《问心2》等最新影视作品</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">🎤</div>
+        <div>
+          <div class="quick-card-title">热门舞台</div>
+          <div class="quick-card-desc">晚会、音乐节精彩现场</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">⭐</div>
+        <div>
+          <div class="quick-card-title">代表作品</div>
+          <div class="quick-card-desc">《青春有你2》等经典舞台</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LATEST WORKS -->
+  <section class="section" id="works">
+    <div class="section-header">
+      <div class="section-title">最新作品</div>
+      <a href="#" class="section-more">
+        <span>全部作品</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="works-grid">
+      <div class="work-card">
+        <div class="work-card-img" data-title="问心2">
+          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
+        </div>
+        <div class="work-card-info">
+          <div class="work-card-title">《问心2》</div>
+          <div class="work-card-meta">
+            <span class="work-card-tag tag-movie">电视剧</span>
+            <span>2026</span>
+            <span>饰 梁美</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-img" data-title="寻找李顺章">
+          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
+        </div>
+        <div class="work-card-info">
+          <div class="work-card-title">《寻找李顺章》</div>
+          <div class="work-card-meta">
+            <span class="work-card-tag tag-movie">电影</span>
+            <span>2025</span>
+            <span>主演</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-img" data-title="中国说唱巅峰对决">
+          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
+        </div>
+        <div class="work-card-info">
+          <div class="work-card-title">《中国说唱巅峰对决》</div>
+          <div class="work-card-meta">
+            <span class="work-card-tag tag-variety">综艺</span>
+            <span>2023</span>
+            <span>选手</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-img" data-title="Black Cupid">
+          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
+        </div>
+        <div class="work-card-info">
+          <div class="work-card-title">《Black Cupid》</div>
+          <div class="work-card-meta">
+            <span class="work-card-tag tag-music">音乐</span>
+            <span>2020</span>
+            <span>作词</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOT STAGES -->
+  <section class="section" id="stage">
+    <div class="section-header">
+      <div class="section-title">热门舞台</div>
+      <a href="#" class="section-more">
+        <span>全部舞台</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="scroll-section">
+      <button class="scroll-arrow prev" onclick="scrollStage(-1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+      <div class="scroll-container" id="stageScroll">
+        <div class="stage-card">
+          <div class="stage-card-img" data-title="舞台照片1"></div>
+          <div class="stage-card-info">
+            <div class="stage-card-date">2023.06.18</div>
+            <div class="stage-card-title">《流浪·地球》Live</div>
+            <div class="stage-card-venue">中国说唱巅峰对决</div>
+          </div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-card-img" data-title="舞台照片2"></div>
+          <div class="stage-card-info">
+            <div class="stage-card-date">2023.05.20</div>
+            <div class="stage-card-title">《飞》抒情舞台</div>
+            <div class="stage-card-venue">音乐节现场</div>
+          </div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-card-img" data-title="舞台照片3"></div>
+          <div class="stage-card-info">
+            <div class="stage-card-date">2020.05.30</div>
+            <div class="stage-card-title">THE9成团夜</div>
+            <div class="stage-card-venue">《青春有你2》总决赛</div>
+          </div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-card-img" data-title="舞台照片4"></div>
+          <div class="stage-card-info">
+            <div class="stage-card-date">2020.04.15</div>
+            <div class="stage-card-title">《109》原创Rap</div>
+            <div class="stage-card-venue">青春有你2舞台</div>
+          </div>
+        </div>
+        <div class="stage-card">
+          <div class="stage-card-img" data-title="舞台照片5"></div>
+          <div class="stage-card-info">
+            <div class="stage-card-date">2023.08.19</div>
+            <div class="stage-card-title">晚会舞台</div>
+            <div class="stage-card-venue">卫视晚会</div>
+          </div>
+        </div>
+      </div>
+      <button class="scroll-arrow next" onclick="scrollStage(1)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- TIMELINE PREVIEW -->
+  <section class="section" id="timeline">
+    <div class="section-header">
+      <div class="section-title">成长足迹</div>
+      <a href="timeline.html" class="section-more">
+        <span>完整时间线</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="timeline-preview">
+      <div class="timeline-node">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2018</div>
+        <div class="timeline-label">《下一站传奇》</div>
+      </div>
+      <div class="timeline-line"></div>
+      <div class="timeline-node">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2020</div>
+        <div class="timeline-label">THE9出道</div>
+      </div>
+      <div class="timeline-line"></div>
+      <div class="timeline-node">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2023</div>
+        <div class="timeline-label">演员转型</div>
+      </div>
+      <div class="timeline-line"></div>
+      <div class="timeline-node">
+        <div class="timeline-dot"></div>
+        <div class="timeline-year">2026</div>
+        <div class="timeline-label">《问心2》出圈</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    © 2026 Shaking Chloe 谢可寅粉丝站 | 非官方网站，仅供粉丝交流使用
+  </footer>
+
+</main>
+
+<!-- CHATBOT -->
+<div class="chatbot-float" id="chatbotToggle">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>
+</div>
+<div class="chatbot-window" id="chatbotWindow">
+  <div class="chatbot-header">
+    <div class="chatbot-header-title">
+      <div class="chatbot-status"></div>
+      <span>Shaking 小助手</span>
+    </div>
+    <div class="chatbot-close" id="chatbotClose">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </div>
+  </div>
+  <div class="chatbot-body">
+    <div class="chatbot-welcome">
+      <div class="chatbot-welcome-icon">🐯</div>
+      <div class="chatbot-welcome-title">你好，我是 Shaking 小助手</div>
+      <div class="chatbot-welcome-desc">关于谢可寅的问题都可以问我</div>
+      <div class="chatbot-quick-btns">
+        <button class="chatbot-quick-btn">谢可寅是谁？</button>
+        <button class="chatbot-quick-btn">有哪些作品？</button>
+        <button class="chatbot-quick-btn">粉丝名叫什么？</button>
+      </div>
+    </div>
+    <div class="chatbot-msg ai">
+      <div class="chatbot-avatar ai">AI</div>
+      <div class="chatbot-msg-bubble">你好！我是谢可寅的AI小助手，可以帮你了解她的作品、舞台、音乐等信息。你想知道什么？</div>
+    </div>
+  </div>
+  <div class="chatbot-input-area">
+    <input type="text" class="chatbot-input" placeholder="输入你的问题...">
+    <button class="chatbot-send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  // Navbar scroll effect
+  const topNav = document.getElementById('topNav');
+  window.addEventListener('scroll', () => {
+    topNav.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Chatbot toggle
+  const chatbotToggle = document.getElementById('chatbotToggle');
+  const chatbotWindow = document.getElementById('chatbotWindow');
+  const chatbotClose = document.getElementById('chatbotClose');
+  chatbotToggle.addEventListener('click', () => chatbotWindow.classList.toggle('open'));
+  chatbotClose.addEventListener('click', () => chatbotWindow.classList.remove('open'));
+
+  // Horizontal scroll for stages
+  function scrollStage(direction) {
+    const container = document.getElementById('stageScroll');
+    container.scrollBy({ left: direction * 300, behavior: 'smooth' });
+  }
+
+  // Carousel dots (simple visual toggle)
+  document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      document.querySelectorAll('.carousel-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+    });
+  });
+
+  // Quick jump smooth scroll
+  document.querySelectorAll('.quick-jump-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(item.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
