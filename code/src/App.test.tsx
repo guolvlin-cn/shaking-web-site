@@ -10,7 +10,7 @@ describe('App 路由骨架', () => {
         <AppRoutes />
       </MemoryRouter>,
     );
-    expect(await screen.findByTestId('page-title')).toHaveTextContent('首页');
+    expect(await screen.findByTestId('page-home')).toBeInTheDocument();
   });
 
   it('访问 /about 渲染关于页', async () => {
@@ -28,7 +28,7 @@ describe('App 路由骨架', () => {
         <AppRoutes />
       </MemoryRouter>,
     );
-    expect(await screen.findByTestId('page-title')).toHaveTextContent('首页');
+    expect(await screen.findByTestId('page-home')).toBeInTheDocument();
   });
 
   it('访问 /works 渲染作品合集页', async () => {
