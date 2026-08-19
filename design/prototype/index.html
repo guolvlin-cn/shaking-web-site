@@ -207,6 +207,25 @@
       background: var(--accent-gold); color: var(--bg-primary);
       box-shadow: 0 0 30px var(--accent-gold-glow);
     }
+    .hero-bio {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.6;
+      max-width: 360px;
+    }
+    .hero-social {
+      display: flex; gap: 12px; margin-top: 4px;
+    }
+    .hero-social-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(255,255,255,0.1); border: 1px solid var(--border-default);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-secondary); text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    .hero-social-btn:hover {
+      color: var(--accent-gold);
+      background: rgba(245,197,24,0.1); border-color: var(--accent-gold);
+      transform: translateY(-2px);
+    }
     .hero-center {
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       width: 420px; height: 560px; border-radius: 20px;
@@ -368,54 +387,58 @@
     .tag-stage { background: linear-gradient(135deg, #00d2d3, #01a3a4); color: white; }
     .tag-variety { background: linear-gradient(135deg, #ff9f43, #feca57); color: white; }
 
-    /* ========== HORIZONTAL SCROLL SECTION ========== */
-    .scroll-section {
-      position: relative;
+    /* ========== UPCOMING (敬请期待) ========== */
+    .upcoming-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
     }
-    .scroll-container {
-      display: flex; gap: 16px; overflow-x: auto;
-      scroll-behavior: smooth; scrollbar-width: none;
-      padding-bottom: 8px;
-    }
-    .scroll-container::-webkit-scrollbar { display: none; }
-    .scroll-arrow {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(255,255,255,0.1); border: 1px solid var(--border-default);
-      color: var(--text-primary); cursor: pointer; z-index: 10;
-      display: flex; align-items: center; justify-content: center;
+    .upcoming-card {
+      border-radius: 12px; overflow: hidden; cursor: pointer;
+      background: var(--bg-tertiary); border: 1px solid var(--border-default);
       transition: all 0.3s ease;
     }
-    .scroll-arrow:hover {
-      background: rgba(245,197,24,0.2); border-color: var(--accent-gold);
-      color: var(--accent-gold);
-    }
-    .scroll-arrow.prev { left: -20px; }
-    .scroll-arrow.next { right: -20px; }
-    .stage-card {
-      flex-shrink: 0; width: 280px; border-radius: 12px;
-      overflow: hidden; background: var(--bg-tertiary);
-      border: 1px solid var(--border-default); cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    .stage-card:hover {
+    .upcoming-card:hover {
       border-color: var(--accent-gold);
       transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 20px rgba(245,197,24,0.1);
     }
-    .stage-card-img {
-      height: 360px; background: linear-gradient(135deg, #1a0a1a, #0a1a1a);
-      position: relative;
+    .upcoming-card-img {
+      aspect-ratio: 3/4; position: relative; overflow: hidden;
+      background: linear-gradient(135deg, #1a1a2e 0%, #2a1a3a 50%, #0a1a2e 100%);
+      filter: saturate(0.6) brightness(0.7);
+      transition: filter 0.3s ease;
     }
-    .stage-card-img::after {
+    .upcoming-card:hover .upcoming-card-img { filter: saturate(0.9) brightness(0.85); }
+    .upcoming-card-img::after {
       content: attr(data-title); position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px; color: var(--text-secondary);
+      font-size: 16px; font-weight: 600; color: var(--text-secondary);
+      opacity: 0.5;
     }
-    .stage-card-info { padding: 12px 16px; }
-    .stage-card-date { font-size: 12px; color: var(--accent-gold); font-weight: 500; }
-    .stage-card-title { font-size: 14px; font-weight: 600; margin-top: 4px; }
-    .stage-card-venue { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .upcoming-seal {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      padding: 10px 22px; border-radius: 8px;
+      border: 2px solid var(--accent-gold); color: var(--accent-gold);
+      font-size: 16px; font-weight: 700; letter-spacing: 4px;
+      background: rgba(10,10,10,0.5); backdrop-filter: blur(2px);
+      transition: all 0.3s ease; z-index: 2;
+    }
+    .upcoming-card:hover .upcoming-seal {
+      background: rgba(245,197,24,0.15); box-shadow: 0 0 24px rgba(245,197,24,0.3);
+    }
+    .upcoming-card-info { padding: 12px 16px; }
+    .upcoming-card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .upcoming-card-meta {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+    .upcoming-card-tag {
+      padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500;
+      border: 1px solid transparent;
+    }
+    .tag-upcoming-1 { background: #1890ff20; color: #1890ff; border-color: #1890ff40; }
+    .tag-upcoming-2 { background: #ff9f4320; color: #ff9f43; border-color: #ff9f4340; }
+    .tag-upcoming-3 { background: #5f27cd20; color: #b388ff; border-color: #5f27cd40; }
+    .upcoming-card-note { font-size: 12px; color: var(--accent-gold); margin-top: 2px; }
 
     /* ========== TIMELINE PREVIEW ========== */
     .timeline-preview {
@@ -568,6 +591,7 @@
       .hero-center { width: 300px; height: 400px; }
       .hero-avatar { width: 200px; height: 280px; }
       .works-grid { grid-template-columns: repeat(3, 1fr); }
+      .upcoming-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 768px) {
       .top-nav { padding: 0 16px; }
@@ -578,6 +602,7 @@
       .hero-right { display: none; }
       .quick-cards { grid-template-columns: 1fr; }
       .works-grid { grid-template-columns: repeat(2, 1fr); }
+      .upcoming-grid { grid-template-columns: 1fr; }
       .section { padding: 40px 16px; }
       .chatbot-window { width: calc(100vw - 32px); right: 16px; }
       .timeline-preview { gap: 24px; }
@@ -631,6 +656,14 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>
     <span>舞台活动</span>
   </a>
+  <a href="#variety" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+    <span>综艺专区</span>
+  </a>
+  <a href="#interview" class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+    <span>采访专区</span>
+  </a>
   <a href="#gallery" class="nav-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L9 18"/></svg>
     <span>相册图库</span>
@@ -675,6 +708,18 @@
           <span class="hero-tag">演员</span>
           <span class="hero-tag">Rapper</span>
         </div>
+        <div class="hero-bio">从舞台到银幕，不断突破的全能艺人。</div>
+        <div class="hero-social">
+          <a href="#" title="微博" class="hero-social-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M10.7 18.4c-3.6.4-6.7-1.3-6.9-3.7-.2-2.4 2.6-4.7 6.2-5.1 3.6-.4 6.7 1.3 6.9 3.7.2 2.4-2.6 4.7-6.2 5.1zm8.1-9.5c-.3-.9-1.2-1.5-2.1-1.3-.9.2-1.5 1.1-1.3 2 .2.9 1.1 1.5 2 1.3.9-.2 1.5-1.1 1.4-2zm-1.8-3.2c-.5-1.5-2-2.5-3.6-2.2-1.5.3-2.5 1.8-2.2 3.4.3 1.5 1.8 2.5 3.4 2.2 1.5-.3 2.5-1.8 2.4-3.4z"/></svg>
+          </a>
+          <a href="#" title="小红书" class="hero-social-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/></svg>
+          </a>
+          <a href="#" title="抖音" class="hero-social-btn">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M19.6 4.8c-.2-.1-.4-.2-.6-.3-.5-.2-1-.4-1.5-.5-.5-.1-1.1-.2-1.6-.2-.6 0-1.1.1-1.7.2-.5.1-1 .3-1.5.5-.2.1-.4.2-.6.3-.2.1-.4.2-.5.4-.2.1-.3.3-.5.4-.1.2-.3.3-.4.5-.1.2-.2.3-.3.5-.1.2-.2.4-.2.6-.1.2-.1.4-.1.6v8.4c0 .2 0 .4.1.6.1.2.1.4.2.6.1.2.2.4.3.5.1.2.3.3.4.5.1.2.3.3.5.4.2.1.3.3.5.4.2.1.4.2.6.3.2.1.4.2.6.2.2.1.4.1.6.1h.6c.2 0 .4-.1.6-.1.2-.1.4-.1.6-.2.2-.1.4-.2.6-.3.2-.1.4-.2.5-.4.2-.1.3-.3.5-.4.1-.2.3-.3.4-.5.1-.2.2-.4.3-.5.1-.2.2-.4.2-.6.1-.2.1-.4.1-.6V9.6c0-.2 0-.4-.1-.6-.1-.2-.1-.4-.2-.6-.1-.2-.2-.4-.3-.5-.1-.2-.3-.3-.4-.5-.1-.2-.3-.3-.5-.4-.2-.1-.3-.3-.5-.4-.2-.1-.4-.2-.6-.3z"/></svg>
+          </a>
+        </div>
         <a href="#works" class="hero-cta">
           <span>查看作品</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -685,57 +730,14 @@
       </div>
       <div class="hero-right">
         <a href="#works" class="quick-jump-item"><span class="quick-jump-num">01</span><span class="quick-jump-text">最新作品</span></a>
-        <a href="#stage" class="quick-jump-item"><span class="quick-jump-num">02</span><span class="quick-jump-text">热门舞台</span></a>
-        <a href="#timeline" class="quick-jump-item"><span class="quick-jump-num">03</span><span class="quick-jump-text">成长时间线</span></a>
-        <a href="#music" class="quick-jump-item"><span class="quick-jump-num">04</span><span class="quick-jump-text">音乐专区</span></a>
+        <a href="#upcoming" class="quick-jump-item"><span class="quick-jump-num">02</span><span class="quick-jump-text">敬请期待</span></a>
+        <a href="#quick" class="quick-jump-item"><span class="quick-jump-num">03</span><span class="quick-jump-text">探索更多</span></a>
+        <a href="#timeline" class="quick-jump-item"><span class="quick-jump-num">04</span><span class="quick-jump-text">成长足迹</span></a>
       </div>
     </div>
     <div class="scroll-hint">
       <span>向下滚动</span>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
-    </div>
-  </section>
-
-  <!-- QUICK ACCESS CARDS -->
-  <section class="section" id="quick">
-    <div class="section-header">
-      <div class="section-title">探索更多</div>
-      <a href="#" class="section-more">
-        <span>查看全部</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-      </a>
-    </div>
-    <div class="quick-cards">
-      <div class="quick-card">
-        <div class="quick-card-icon">🎬</div>
-        <div>
-          <div class="quick-card-title">最新作品</div>
-          <div class="quick-card-desc">《问心2》等最新影视作品</div>
-        </div>
-        <div class="quick-card-arrow">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-      </div>
-      <div class="quick-card">
-        <div class="quick-card-icon">🎤</div>
-        <div>
-          <div class="quick-card-title">热门舞台</div>
-          <div class="quick-card-desc">晚会、音乐节精彩现场</div>
-        </div>
-        <div class="quick-card-arrow">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-      </div>
-      <div class="quick-card">
-        <div class="quick-card-icon">⭐</div>
-        <div>
-          <div class="quick-card-title">代表作品</div>
-          <div class="quick-card-desc">《青春有你2》等经典舞台</div>
-        </div>
-        <div class="quick-card-arrow">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -756,9 +758,35 @@
         <div class="work-card-info">
           <div class="work-card-title">《问心2》</div>
           <div class="work-card-meta">
-            <span class="work-card-tag tag-movie">电视剧</span>
+            <span class="work-card-tag tag-movie">影视</span>
             <span>2026</span>
             <span>饰 梁美</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-img" data-title="流浪地球 Live">
+          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
+        </div>
+        <div class="work-card-info">
+          <div class="work-card-title">《流浪·地球》Live</div>
+          <div class="work-card-meta">
+            <span class="work-card-tag tag-stage">舞台</span>
+            <span>2023</span>
+            <span>巅峰对决现场</span>
+          </div>
+        </div>
+      </div>
+      <div class="work-card">
+        <div class="work-card-img" data-title="新歌预告">
+          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
+        </div>
+        <div class="work-card-info">
+          <div class="work-card-title">新歌《XXXX》</div>
+          <div class="work-card-meta">
+            <span class="work-card-tag tag-music">新歌</span>
+            <span>2026</span>
+            <span>单曲</span>
           </div>
         </div>
       </div>
@@ -769,99 +797,137 @@
         <div class="work-card-info">
           <div class="work-card-title">《寻找李顺章》</div>
           <div class="work-card-meta">
-            <span class="work-card-tag tag-movie">电影</span>
+            <span class="work-card-tag tag-movie">影视</span>
             <span>2025</span>
             <span>主演</span>
-          </div>
-        </div>
-      </div>
-      <div class="work-card">
-        <div class="work-card-img" data-title="中国说唱巅峰对决">
-          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
-        </div>
-        <div class="work-card-info">
-          <div class="work-card-title">《中国说唱巅峰对决》</div>
-          <div class="work-card-meta">
-            <span class="work-card-tag tag-variety">综艺</span>
-            <span>2023</span>
-            <span>选手</span>
-          </div>
-        </div>
-      </div>
-      <div class="work-card">
-        <div class="work-card-img" data-title="Black Cupid">
-          <div class="work-card-overlay"><span class="work-card-overlay-text">查看详情</span></div>
-        </div>
-        <div class="work-card-info">
-          <div class="work-card-title">《Black Cupid》</div>
-          <div class="work-card-meta">
-            <span class="work-card-tag tag-music">音乐</span>
-            <span>2020</span>
-            <span>作词</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- HOT STAGES -->
-  <section class="section" id="stage">
+  <!-- COMING SOON -->
+  <section class="section" id="upcoming">
     <div class="section-header">
-      <div class="section-title">热门舞台</div>
+      <div class="section-title">敬请期待</div>
       <a href="#" class="section-more">
-        <span>全部舞台</span>
+        <span>全部预告</span>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
     </div>
-    <div class="scroll-section">
-      <button class="scroll-arrow prev" onclick="scrollStage(-1)">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-      </button>
-      <div class="scroll-container" id="stageScroll">
-        <div class="stage-card">
-          <div class="stage-card-img" data-title="舞台照片1"></div>
-          <div class="stage-card-info">
-            <div class="stage-card-date">2023.06.18</div>
-            <div class="stage-card-title">《流浪·地球》Live</div>
-            <div class="stage-card-venue">中国说唱巅峰对决</div>
-          </div>
+    <div class="upcoming-grid">
+      <div class="upcoming-card">
+        <div class="upcoming-card-img" data-title="《待上映电影》">
+          <div class="upcoming-seal">敬请期待</div>
         </div>
-        <div class="stage-card">
-          <div class="stage-card-img" data-title="舞台照片2"></div>
-          <div class="stage-card-info">
-            <div class="stage-card-date">2023.05.20</div>
-            <div class="stage-card-title">《飞》抒情舞台</div>
-            <div class="stage-card-venue">音乐节现场</div>
+        <div class="upcoming-card-info">
+          <div class="upcoming-card-title">《待上映电影》</div>
+          <div class="upcoming-card-meta">
+            <span class="upcoming-card-tag tag-upcoming-1">即将上线</span>
+            <span>2026</span>
           </div>
-        </div>
-        <div class="stage-card">
-          <div class="stage-card-img" data-title="舞台照片3"></div>
-          <div class="stage-card-info">
-            <div class="stage-card-date">2020.05.30</div>
-            <div class="stage-card-title">THE9成团夜</div>
-            <div class="stage-card-venue">《青春有你2》总决赛</div>
-          </div>
-        </div>
-        <div class="stage-card">
-          <div class="stage-card-img" data-title="舞台照片4"></div>
-          <div class="stage-card-info">
-            <div class="stage-card-date">2020.04.15</div>
-            <div class="stage-card-title">《109》原创Rap</div>
-            <div class="stage-card-venue">青春有你2舞台</div>
-          </div>
-        </div>
-        <div class="stage-card">
-          <div class="stage-card-img" data-title="舞台照片5"></div>
-          <div class="stage-card-info">
-            <div class="stage-card-date">2023.08.19</div>
-            <div class="stage-card-title">晚会舞台</div>
-            <div class="stage-card-venue">卫视晚会</div>
-          </div>
+          <div class="upcoming-card-note">影视 · 预计 2026 Q4</div>
         </div>
       </div>
-      <button class="scroll-arrow next" onclick="scrollStage(1)">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      </button>
+      <div class="upcoming-card">
+        <div class="upcoming-card-img" data-title="新专辑">
+          <div class="upcoming-seal">敬请期待</div>
+        </div>
+        <div class="upcoming-card-info">
+          <div class="upcoming-card-title">新专辑</div>
+          <div class="upcoming-card-meta">
+            <span class="upcoming-card-tag tag-upcoming-2">筹备中</span>
+            <span>2026</span>
+          </div>
+          <div class="upcoming-card-note">音乐 · 预计 2026</div>
+        </div>
+      </div>
+      <div class="upcoming-card">
+        <div class="upcoming-card-img" data-title="《待官宣综艺》">
+          <div class="upcoming-seal">敬请期待</div>
+        </div>
+        <div class="upcoming-card-info">
+          <div class="upcoming-card-title">《待官宣综艺》</div>
+          <div class="upcoming-card-meta">
+            <span class="upcoming-card-tag tag-upcoming-3">待官宣</span>
+            <span>—</span>
+          </div>
+          <div class="upcoming-card-note">综艺 · 官宣时间待定</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPLORE DIRECTORY -->
+  <section class="section" id="quick">
+    <div class="section-header">
+      <div class="section-title">探索更多</div>
+      <a href="#" class="section-more">
+        <span>全站入口</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </a>
+    </div>
+    <div class="quick-cards">
+      <div class="quick-card">
+        <div class="quick-card-icon">🎵</div>
+        <div>
+          <div class="quick-card-title">音乐专区</div>
+          <div class="quick-card-desc">原创单曲 · EP · 舞台Live</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">🎬</div>
+        <div>
+          <div class="quick-card-title">影视专区</div>
+          <div class="quick-card-desc">电视剧 · 电影作品</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">📺</div>
+        <div>
+          <div class="quick-card-title">综艺专区</div>
+          <div class="quick-card-desc">选秀 · 真人秀 · 音综</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">✨</div>
+        <div>
+          <div class="quick-card-title">舞台活动</div>
+          <div class="quick-card-desc">晚会 · 音乐节 · 颁奖典礼</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">🎙️</div>
+        <div>
+          <div class="quick-card-title">采访专区</div>
+          <div class="quick-card-desc">专访 · 采访实录</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
+      <div class="quick-card">
+        <div class="quick-card-icon">📷</div>
+        <div>
+          <div class="quick-card-title">相册图库</div>
+          <div class="quick-card-desc">舞台瞬间 · 写真 · 路透</div>
+        </div>
+        <div class="quick-card-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -959,12 +1025,6 @@
   const chatbotClose = document.getElementById('chatbotClose');
   chatbotToggle.addEventListener('click', () => chatbotWindow.classList.toggle('open'));
   chatbotClose.addEventListener('click', () => chatbotWindow.classList.remove('open'));
-
-  // Horizontal scroll for stages
-  function scrollStage(direction) {
-    const container = document.getElementById('stageScroll');
-    container.scrollBy({ left: direction * 300, behavior: 'smooth' });
-  }
 
   // Carousel dots (simple visual toggle)
   document.querySelectorAll('.carousel-dot').forEach((dot, i) => {
