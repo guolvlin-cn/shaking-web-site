@@ -14,9 +14,10 @@ export default function WorkCard({ work, showStatus, onView }: WorkCardProps) {
 
   return (
     <article
-      className="group relative overflow-hidden rounded-card border border-border bg-bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-hover"
+      className="group relative cursor-pointer overflow-hidden rounded-card border border-border bg-bg-card transition-all duration-300 hover:-translate-y-1 hover:shadow-hover"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={() => onView?.(work)}
       data-testid={`work-card-${work.id}`}
     >
       {/* 封面 */}
