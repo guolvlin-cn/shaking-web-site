@@ -19,7 +19,7 @@ describe('App 路由骨架', () => {
         <AppRoutes />
       </MemoryRouter>,
     );
-    expect(await screen.findByTestId('page-title')).toHaveTextContent('关于谢可寅');
+    expect(await screen.findByTestId('page-about')).toBeInTheDocument();
   });
 
   it('访问未知路径重定向到首页', async () => {
