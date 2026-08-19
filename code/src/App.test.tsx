@@ -37,6 +37,6 @@ describe('App 路由骨架', () => {
         <AppRoutes />
       </MemoryRouter>,
     );
-    expect(await screen.findByTestId('page-title')).toHaveTextContent('作品合集');
+    expect(await screen.findByTestId('page-works')).toBeInTheDocument();
   });
 });
