@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
+import ChatWidget from '../chat/ChatWidget';
 import { useUIStore } from '../../stores/uiStore';
 
 export default function AppLayout() {
@@ -17,6 +18,7 @@ export default function AppLayout() {
           <Outlet />
         </div>
       </main>
+      <ChatWidget />
     </div>
   );
 }
