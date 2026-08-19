@@ -53,6 +53,7 @@ export default function HeroSection() {
             key={slide.id}
             type="button"
             aria-label={`切换到第 ${i + 1} 张`}
+            aria-current={i === current ? 'true' : undefined}
             onClick={() => go(i)}
             className={`h-2 rounded-full transition-all duration-300 ${
               i === current ? 'w-6 bg-accent-gold' : 'w-2 bg-white/40 hover:scale-125'

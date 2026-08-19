@@ -88,6 +88,7 @@ export default function Gallery() {
                   ? 'border-accent-gold bg-accent-gold font-semibold text-bg-base'
                   : 'border-border text-text-secondary hover:bg-white/5 hover:text-text-primary'
               }`}
+              aria-pressed={album === f}
               data-testid={`gallery-album-${f}`}
             >
               {f}

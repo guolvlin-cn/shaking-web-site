@@ -47,6 +47,7 @@ export default function Movies() {
                 ? 'font-semibold text-accent-gold'
                 : 'text-text-secondary hover:text-text-primary'
             }`}
+            aria-pressed={typeTab === tab.key}
             data-testid={`movie-type-tab-${tab.key}`}
           >
             {tab.label}
@@ -69,6 +70,7 @@ export default function Movies() {
                 ? 'border-accent-gold bg-accent-gold font-semibold text-bg-base'
                 : 'border-border text-text-secondary hover:bg-white/5 hover:text-text-primary'
             }`}
+            aria-pressed={statusTab === s}
             data-testid={`movie-status-${s}`}
           >
             {s}

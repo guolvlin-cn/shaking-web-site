@@ -74,6 +74,7 @@ export default function Interview() {
                 ? 'font-semibold text-accent-gold'
                 : 'text-text-secondary hover:text-text-primary'
             }`}
+            aria-pressed={filter === tab.key}
             data-testid={`interview-tab-${tab.key}`}
           >
             {tab.label}

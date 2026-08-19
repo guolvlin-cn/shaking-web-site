@@ -71,6 +71,7 @@ export default function Stage() {
                 ? 'border-accent-gold bg-accent-gold font-semibold text-bg-base'
                 : 'border-border text-text-secondary hover:bg-white/5 hover:text-text-primary'
             }`}
+            aria-pressed={filter === f.key}
             data-testid={`stage-tab-${f.key}`}
           >
             {f.label}
