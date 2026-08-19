@@ -79,6 +79,7 @@ export default function Variety() {
                 ? 'font-semibold text-accent-gold'
                 : 'text-text-secondary hover:text-text-primary'
             }`}
+            aria-pressed={filter === tab.key}
             data-testid={`variety-tab-${tab.key}`}
           >
             {tab.label}

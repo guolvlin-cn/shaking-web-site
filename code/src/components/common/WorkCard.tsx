@@ -38,7 +38,7 @@ export default function WorkCard({ work, showStatus, onView }: WorkCardProps) {
         {/* 悬停遮罩 */}
         <div
           className={`absolute inset-0 flex items-center justify-center bg-black/60 transition-opacity duration-300 ${
-            hovered ? 'opacity-100' : 'opacity-0'
+            hovered ? 'opacity-100' : 'opacity-0 group-focus-within:opacity-100'
           }`}
         >
           <button

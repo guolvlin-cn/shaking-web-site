@@ -100,6 +100,7 @@ export default function MusicPage() {
                 ? 'font-semibold text-accent-gold'
                 : 'text-text-secondary hover:text-text-primary'
             }`}
+            aria-pressed={filter === tab.key}
             data-testid={`music-tab-${tab.key}`}
           >
             {tab.label}
