@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-bg-base text-text-primary font-sans antialiased;
+    min-height: 100vh;
+  }
+
+  ::selection {
+    background-color: rgba(245, 197, 24, 0.3);
+  }
+}
+
+@layer components {
+  .section-title {
+    @apply text-h2 text-text-primary;
+  }
+
+  .section-title-accent {
+    @apply relative pl-4;
+  }
+
+  .section-title-accent::before {
+    content: '';
+    @apply absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded bg-accent-gold;
+  }
+}
