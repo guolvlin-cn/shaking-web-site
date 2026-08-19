@@ -2,9 +2,11 @@ import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import ChatWidget from '../chat/ChatWidget';
 import { useUIStore } from '../../stores/uiStore';
+import usePageMeta from '../../hooks/usePageMeta';
 
 export default function AppLayout() {
   const { sidebarCollapsed } = useUIStore();
+  usePageMeta();
 
   return (
     <div className="min-h-screen">

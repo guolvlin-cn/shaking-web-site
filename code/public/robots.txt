@@ -1,0 +1,3 @@
+# 允许搜索引擎抓取
+User-agent: *
+Allow: /
