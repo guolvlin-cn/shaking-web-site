@@ -29,5 +29,7 @@ pnpm-debug.log*
 # vitest
 coverage
 
-# tsc build info
+# tsc build info / emitted files
 *.tsbuildinfo
+vite.config.js
+vite.config.d.ts
