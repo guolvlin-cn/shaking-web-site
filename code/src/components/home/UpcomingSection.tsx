@@ -1,6 +1,8 @@
+import { useMemo } from 'react';
+import type { Work } from '@shared/types';
 import { Section } from '../common/Section';
-import type { Work } from '../../data/works';
-import { getUpcomingWorks } from '../../data/works';
+import { useWorks } from '../../hooks/useContentQueries';
+import { LoadingState } from '../common/AsyncState';
 
 const STATUS_STYLES: Record<string, string> = {
   即将上线: 'bg-[#1890ff20] text-[#1890ff] border-[#1890ff40]',
@@ -8,12 +10,26 @@ const STATUS_STYLES: Record<string, string> = {
   待官宣: 'bg-[#5f27cd20] text-[#b388ff] border-[#5f27cd40]',
 };
 
+const UPCOMING_STATUS = ['即将上线', '筹备中', '待官宣'];
+
 interface UpcomingSectionProps {
   works?: Work[];
 }
 
 export default function UpcomingSection({ works }: UpcomingSectionProps) {
-  const list = works ?? getUpcomingWorks();
+  const { data: fetched = [], isLoading } = useWorks();
+  const list = useMemo(() => {
+    if (works) return works;
+    return fetched.filter((w) => UPCOMING_STATUS.includes(w.status));
+  }, [works, fetched]);
+
+  if (isLoading) {
+    return (
+      <Section id="upcoming" title="敬请期待">
+        <LoadingState />
+      </Section>
+    );
+  }
 
   return (
     <Section id="upcoming" title="敬请期待">

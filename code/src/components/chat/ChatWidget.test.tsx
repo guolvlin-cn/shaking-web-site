@@ -1,6 +1,33 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ChatWidget from './ChatWidget';
+
+// 模拟后端 /api/chat：命中本地知识库返回答案；未命中抛错（触发维护提示）
+const { mutateAsync } = vi.hoisted(() => ({
+  mutateAsync: vi.fn(async (question: string) => {
+    if (question.includes('谢可寅是谁')) {
+      return {
+        answer: '谢可寅（Shaking Chloe）——歌手、演员、Rapper',
+        source: '来自官方资料',
+        isFallback: true,
+        fallbackType: 'matched' as const,
+      };
+    }
+    if (question.includes('粉丝')) {
+      return {
+        answer: '谢可寅的粉丝名叫「虎卫队」',
+        source: '来自官方资料',
+        isFallback: true,
+        fallbackType: 'matched' as const,
+      };
+    }
+    throw new Error('NO_ANSWER');
+  }),
+}));
+
+vi.mock('../../hooks/useContentQueries', () => ({
+  useChatAnswer: () => ({ mutateAsync, isPending: false }),
+}));
 
 function renderChat() {
   return render(<ChatWidget />);

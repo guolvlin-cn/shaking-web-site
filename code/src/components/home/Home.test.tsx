@@ -2,7 +2,21 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Home from '../../pages/Home';
-import { getLatestWorks, getUpcomingWorks } from '../../data/works';
+import { WORKS, getLatestWorks, getUpcomingWorks } from '../../data/works';
+import { SITE, SOCIAL_LINKS, HERO_SLIDES, QUICK_JUMP_SECTIONS } from '../../data/site';
+
+const SITE_CONFIG = {
+  site: SITE,
+  socialLinks: SOCIAL_LINKS,
+  heroSlides: HERO_SLIDES,
+  quickJumpSections: QUICK_JUMP_SECTIONS,
+  announcement: '',
+};
+
+vi.mock('../../hooks/useContentQueries', () => ({
+  useWorks: () => ({ data: WORKS, isLoading: false, isError: false, refetch: vi.fn() }),
+  useSiteConfig: () => ({ data: SITE_CONFIG, isLoading: false, isError: false, refetch: vi.fn() }),
+}));
 
 function renderHome() {
   return render(

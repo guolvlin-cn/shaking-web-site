@@ -1,21 +1,34 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, ArrowDown } from 'lucide-react';
-import { HERO_SLIDES, SOCIAL_LINKS, QUICK_JUMP_SECTIONS, SITE } from '../../data/site';
+import { useSiteConfig } from '../../hooks/useContentQueries';
+import { LoadingState } from '../common/AsyncState';
 
 const AUTOPLAY_MS = 5000;
 
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { data: config } = useSiteConfig();
 
-  const go = useCallback((next: number) => {
-    setCurrent((next + HERO_SLIDES.length) % HERO_SLIDES.length);
-  }, []);
+  const slides = config?.heroSlides ?? [];
+  const socialLinks = config?.socialLinks ?? [];
+  const quickJumpSections = config?.quickJumpSections ?? [];
+  const site = config?.site;
+  const slideCount = slides.length;
+
+  const go = useCallback(
+    (next: number) => {
+      if (slideCount === 0) return;
+      setCurrent((next + slideCount) % slideCount);
+    },
+    [slideCount],
+  );
 
   const restartTimer = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => setCurrent((c) => (c + 1) % HERO_SLIDES.length), AUTOPLAY_MS);
-  }, []);
+    if (slideCount === 0) return;
+    timerRef.current = setInterval(() => setCurrent((c) => (c + 1) % slideCount), AUTOPLAY_MS);
+  }, [slideCount]);
 
   useEffect(() => {
     restartTimer();
@@ -28,12 +41,20 @@ export default function HeroSection() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  if (!config) {
+    return (
+      <section className="flex min-h-screen items-center justify-center" aria-label="首页首屏">
+        <LoadingState />
+      </section>
+    );
+  }
+
   return (
     <section
       className="relative -mx-4 flex min-h-screen flex-col justify-end overflow-hidden px-6 pb-16 md:-mx-8 md:px-12"
       aria-label="首页首屏"
     >
-      {HERO_SLIDES.map((slide, i) => (
+      {slides.map((slide, i) => (
         <div
           key={slide.id}
           className={`absolute inset-0 transition-opacity duration-1000 ${
@@ -48,7 +69,7 @@ export default function HeroSection() {
 
       {/* 左侧垂直轮播指示器 */}
       <div className="absolute left-4 top-1/2 flex -translate-y-1/2 flex-col items-center gap-3 md:left-8">
-        {HERO_SLIDES.map((slide, i) => (
+        {slides.map((slide, i) => (
           <button
             key={slide.id}
             type="button"
@@ -65,14 +86,14 @@ export default function HeroSection() {
       {/* 主内容（左下） */}
       <div className="relative z-10 max-w-2xl">
         <div key={current} className="animate-slide-up">
-          <h1 className="text-h1 text-text-primary md:text-5xl">{SITE.name}</h1>
-          <p className="mt-1 text-h3 font-medium text-accent-gold">{SITE.chineseName}</p>
-          <p className="mt-3 max-w-md text-body text-text-secondary">{SITE.tagline}</p>
+          <h1 className="text-h1 text-text-primary md:text-5xl">{site?.name}</h1>
+          <p className="mt-1 text-h3 font-medium text-accent-gold">{site?.chineseName}</p>
+          <p className="mt-3 max-w-md text-body text-text-secondary">{site?.tagline}</p>
         </div>
 
         {/* 社交链接 */}
         <div className="mt-5 flex items-center gap-3">
-          {SOCIAL_LINKS.map((s) => (
+          {socialLinks.map((s) => (
             <a
               key={s.name}
               href={s.href}
@@ -100,7 +121,7 @@ export default function HeroSection() {
 
       {/* 右侧快速跳转 */}
       <div className="absolute right-4 top-1/2 hidden -translate-y-1/2 flex-col items-end gap-4 md:right-8 lg:flex">
-        {QUICK_JUMP_SECTIONS.map((s) => (
+        {quickJumpSections.map((s) => (
           <button
             key={s.id}
             type="button"

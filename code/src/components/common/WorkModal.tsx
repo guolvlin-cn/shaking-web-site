@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { X, ExternalLink, Play } from 'lucide-react';
-import type { Work } from '../../data/works';
+import type { Work } from '@shared/types';
 import { TYPE_TAG_COLORS } from '../../data/site';
 
 interface WorkModalProps {

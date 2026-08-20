@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MessageCircle, X, Send, Sparkles } from 'lucide-react';
-import { findFaqAnswer, MAINTENANCE_MESSAGE } from '../../data/faq';
+import { useChatAnswer } from '../../hooks/useContentQueries';
 
 interface ChatMessage {
   id: string;
@@ -12,64 +12,46 @@ interface ChatMessage {
 
 const QUICK_QUESTIONS = ['谢可寅是谁？', '有哪些代表作品？', '粉丝名叫什么？'];
 
+const MAINTENANCE_MESSAGE = '问答服务维护中，请稍后再试。';
+
 let msgId = 0;
 const nextId = () => `msg-${++msgId}`;
-
-// 模拟 MOI 问答服务（当前用本地 FAQ 兜底；接入真实 MOI API 时替换此函数）
-async function requestAnswer(question: string): Promise<{ answer: string; source?: string }> {
-  await new Promise((r) => setTimeout(r, 600));
-  const hit = findFaqAnswer(question);
-  if (hit) return hit;
-  throw new Error('NO_ANSWER');
-}
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
   const bodyRef = useRef<HTMLDivElement>(null);
+  const { mutateAsync, isPending } = useChatAnswer();
 
-  const send = useCallback(async (raw: string) => {
-    const content = raw.trim();
-    if (!content || loading) return;
-    const userMsg: ChatMessage = { id: nextId(), role: 'user', content };
-    setMessages((m) => [...m, userMsg]);
-    setInput('');
-    setLoading(true);
+  const send = useCallback(
+    async (raw: string) => {
+      const content = raw.trim();
+      if (!content || isPending) return;
+      const userMsg: ChatMessage = { id: nextId(), role: 'user', content };
+      setMessages((m) => [...m, userMsg]);
+      setInput('');
 
-    try {
-      const res = await requestAnswer(content);
-      setMessages((m) => [
-        ...m,
-        { id: nextId(), role: 'assistant', content: res.answer, source: res.source },
-      ]);
-    } catch {
-      const fallback = findFaqAnswer(content);
-      if (fallback) {
+      try {
+        // 问答走后端 /api/chat（qa_knowledge 关键词匹配 + 兜底）
+        const res = await mutateAsync(content);
         setMessages((m) => [
           ...m,
-          { id: nextId(), role: 'assistant', content: fallback.answer, source: fallback.source },
+          { id: nextId(), role: 'assistant', content: res.answer, source: res.source },
         ]);
-      } else {
+      } catch {
         setMessages((m) => [
           ...m,
-          {
-            id: nextId(),
-            role: 'assistant',
-            content: MAINTENANCE_MESSAGE,
-            error: true,
-          },
+          { id: nextId(), role: 'assistant', content: MAINTENANCE_MESSAGE, error: true },
         ]);
       }
-    } finally {
-      setLoading(false);
-    }
-  }, [loading]);
+    },
+    [mutateAsync, isPending],
+  );
 
   useEffect(() => {
     bodyRef.current?.scrollTo?.({ top: bodyRef.current.scrollHeight, behavior: 'smooth' });
-  }, [messages, loading]);
+  }, [messages, isPending]);
 
   return (
     <>
@@ -127,7 +109,7 @@ export default function ChatWidget() {
                 </div>
               </div>
             ))}
-            {loading && (
+            {isPending && (
               <div className="flex justify-start">
                 <div className="rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-secondary">
                   思考中…

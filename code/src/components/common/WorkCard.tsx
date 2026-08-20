@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { Work } from '../../data/works';
+import type { Work } from '@shared/types';
 import { TYPE_TAG_COLORS } from '../../data/site';
 
 interface WorkCardProps {

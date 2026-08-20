@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AppLayout from './AppLayout';
 import { useUIStore } from '../../stores/uiStore';
 import PlaceholderPage from '../common/PlaceholderPage';
@@ -31,17 +32,19 @@ afterEach(() => {
 
 function renderLayout(initialPath = '/') {
   return render(
-    <MemoryRouter initialEntries={[initialPath]}>
-      <Routes>
-        <Route element={<AppLayout />}>
-          <Route path="/" element={<PlaceholderPage title="首页" />} />
-          <Route path="/works" element={<PlaceholderPage title="作品合集" />} />
-          <Route path="/music" element={<PlaceholderPage title="音乐专区" />} />
-          <Route path="/gallery" element={<PlaceholderPage title="相册图库" />} />
-          <Route path="/about" element={<PlaceholderPage title="关于谢可寅" />} />
-        </Route>
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={[initialPath]}>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<PlaceholderPage title="首页" />} />
+            <Route path="/works" element={<PlaceholderPage title="作品合集" />} />
+            <Route path="/music" element={<PlaceholderPage title="音乐专区" />} />
+            <Route path="/gallery" element={<PlaceholderPage title="相册图库" />} />
+            <Route path="/about" element={<PlaceholderPage title="关于谢可寅" />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   );
 }
 
