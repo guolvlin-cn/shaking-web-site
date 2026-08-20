@@ -19,7 +19,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "shared", "vite.config.ts"]
 }

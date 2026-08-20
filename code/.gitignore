@@ -33,3 +33,6 @@ coverage
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+
+# local db config (contains credentials)
+server/config/db.local.json
