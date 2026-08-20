@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Variety from './Variety';
 import { VARIETY_SHOWS } from '../data/variety';
+
+vi.mock('../hooks/useContentQueries', () => ({
+  useVariety: () => ({ data: VARIETY_SHOWS, isLoading: false, isError: false, refetch: vi.fn() }),
+}));
 
 function renderVariety() {
   return render(

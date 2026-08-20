@@ -1,8 +1,20 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Interview from './Interview';
 import { INTERVIEWS, QUOTES } from '../data/interview';
+
+// 后端 /api/interviews 现在携带 quotes 字段（种子数据来自 QUOTES）
+const INTERVIEW_FIXTURE = INTERVIEWS.map((item) => ({ ...item, quotes: QUOTES }));
+
+vi.mock('../hooks/useContentQueries', () => ({
+  useInterviews: () => ({
+    data: INTERVIEW_FIXTURE,
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  }),
+}));
 
 function renderInterview() {
   return render(

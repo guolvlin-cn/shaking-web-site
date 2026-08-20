@@ -1,7 +1,18 @@
 import { useMemo, useState } from 'react';
 import { Camera } from 'lucide-react';
-import { STAGE_EVENTS, STAGE_FILTERS, type StageEvent } from '../data/stage';
+import type { StageEvent } from '@shared/types';
+import { useStage } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
 import Lightbox from '../components/common/Lightbox';
+
+const STAGE_FILTERS: Array<{ key: string; label: string }> = [
+  { key: '全部', label: '全部' },
+  { key: '晚会', label: '晚会' },
+  { key: '音乐节', label: '音乐节' },
+  { key: '团体活动', label: '团体活动' },
+  { key: '选秀历程', label: '选秀历程' },
+  { key: '颁奖典礼', label: '颁奖典礼' },
+];
 
 function StageCard({ event, onOpenGallery }: { event: StageEvent; onOpenGallery: (e: StageEvent) => void }) {
   return (
@@ -30,7 +41,7 @@ function StageCard({ event, onOpenGallery }: { event: StageEvent; onOpenGallery:
           className="mt-3 flex items-center gap-1.5 text-sm text-accent-gold transition-colors hover:underline"
         >
           <Camera size={16} />
-          查看图集（{event.photos.length} 张）
+          查看图集（{event.photos?.length ?? 0} 张）
         </button>
       </div>
     </article>
@@ -40,15 +51,16 @@ function StageCard({ event, onOpenGallery }: { event: StageEvent; onOpenGallery:
 export default function Stage() {
   const [filter, setFilter] = useState('全部');
   const [galleryEvent, setGalleryEvent] = useState<StageEvent | null>(null);
+  const { data: stageEvents = [], isLoading, isError, refetch } = useStage();
 
   const filtered = useMemo(() => {
     const list =
-      filter === '全部' ? STAGE_EVENTS : STAGE_EVENTS.filter((e) => e.category === filter);
+      filter === '全部' ? stageEvents : stageEvents.filter((e) => e.category === filter);
     return list.sort((a, b) => b.date.localeCompare(a.date));
-  }, [filter]);
+  }, [stageEvents, filter]);
 
   const galleryPhotos = useMemo(
-    () => (galleryEvent ? galleryEvent.photos : []),
+    () => galleryEvent?.photos ?? [],
     [galleryEvent],
   );
 
@@ -80,14 +92,22 @@ export default function Stage() {
       </div>
 
       {/* 卡片网格 */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((event) => (
-          <StageCard key={event.id} event={event} onOpenGallery={setGalleryEvent} />
-        ))}
-      </div>
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : (
+        <>
+          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((event) => (
+              <StageCard key={event.id} event={event} onOpenGallery={setGalleryEvent} />
+            ))}
+          </div>
 
-      {filtered.length === 0 && (
-        <div className="py-16 text-center text-text-secondary">该分类下暂无舞台活动</div>
+          {filtered.length === 0 && (
+            <div className="py-16 text-center text-text-secondary">该分类下暂无舞台活动</div>
+          )}
+        </>
       )}
 
       <Lightbox

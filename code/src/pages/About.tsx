@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { SITE } from '../data/site';
+import { useSiteConfig } from '../hooks/useContentQueries';
 
 const PROFILE = {
   chineseName: '谢可寅',
@@ -32,6 +32,9 @@ const REPRESENTATIVES = [
 ];
 
 export default function About() {
+  const { data: siteConfig } = useSiteConfig();
+  const chineseName = siteConfig?.site.chineseName ?? '谢可寅';
+
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-12 md:px-8" data-testid="page-about">
       {/* Hero 区 */}
@@ -141,7 +144,7 @@ export default function About() {
       </section>
 
       <footer className="mt-12 border-t border-border pt-4 text-center text-caption text-[#666666]">
-        © 2026 Shaking Chloe {SITE.chineseName}粉丝站 | 非官方网站，仅供粉丝交流使用
+        © 2026 {chineseName}粉丝站 | 非官方网站，仅供粉丝交流使用
       </footer>
     </div>
   );

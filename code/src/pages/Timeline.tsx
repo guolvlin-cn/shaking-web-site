@@ -1,12 +1,19 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import {
-  TIMELINE_EVENTS,
-  TIMELINE_FILTERS,
-  getYearGroups,
-  type TimelineEvent,
-} from '../data/timeline';
+import type { TimelineEvent } from '@shared/types';
+import { useTimeline } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
+
+const TIMELINE_FILTERS: Array<{ key: string; label: string }> = [
+  { key: '全部', label: '全部' },
+  { key: '选秀', label: '选秀' },
+  { key: '出道', label: '出道' },
+  { key: '影视', label: '影视' },
+  { key: '音乐', label: '音乐' },
+  { key: '舞台', label: '舞台' },
+  { key: '获奖', label: '获奖' },
+];
 
 const CATEGORY_COLORS: Record<string, string> = {
   选秀: 'bg-[#ff9f43]',
@@ -16,6 +23,17 @@ const CATEGORY_COLORS: Record<string, string> = {
   舞台: 'bg-[#00d2d3]',
   获奖: 'bg-[#52c41a]',
   其他: 'bg-[#a0a0a0]',
+};
+
+const getYearGroups = (events: TimelineEvent[]): Map<string, TimelineEvent[]> => {
+  const groups = new Map<string, TimelineEvent[]>();
+  const sorted = [...events].sort((a, b) => b.eventDate.localeCompare(a.eventDate));
+  for (const ev of sorted) {
+    const year = ev.eventDate.slice(0, 4);
+    if (!groups.has(year)) groups.set(year, []);
+    groups.get(year)!.push(ev);
+  }
+  return groups;
 };
 
 function TimelineNode({ event, side }: { event: TimelineEvent; side: 'left' | 'right' }) {
@@ -88,11 +106,12 @@ function TimelineNode({ event, side }: { event: TimelineEvent; side: 'left' | 'r
 
 export default function TimelinePage() {
   const [filter, setFilter] = useState<'全部' | string>('全部');
+  const { data: events = [], isLoading, isError, refetch } = useTimeline();
 
   const filteredEvents = useMemo(() => {
-    if (filter === '全部') return TIMELINE_EVENTS;
-    return TIMELINE_EVENTS.filter((e) => e.category === filter);
-  }, [filter]);
+    if (filter === '全部') return events;
+    return events.filter((e) => e.category === filter);
+  }, [events, filter]);
 
   const yearGroups = useMemo(() => getYearGroups(filteredEvents), [filteredEvents]);
 
@@ -122,36 +141,42 @@ export default function TimelinePage() {
       </div>
 
       {/* 时间线主体 */}
-      <div className="relative mt-10">
-        {/* 中轴线 */}
-        <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-[#3a3a3a]" />
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : (
+        <div className="relative mt-10">
+          {/* 中轴线 */}
+          <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 bg-[#3a3a3a]" />
 
-        {Array.from(yearGroups.entries()).map(([year, events]) => (
-          <div key={year} className="mb-12" data-testid={`timeline-year-${year}`}>
-            {/* 年份标记 */}
-            <div className="relative z-10 mb-8 flex justify-center">
-              <span className="rounded-full border border-border bg-bg-card px-6 py-2 text-h3 font-bold text-accent-gold">
-                {year}
-              </span>
+          {Array.from(yearGroups.entries()).map(([year, yearEvents]) => (
+            <div key={year} className="mb-12" data-testid={`timeline-year-${year}`}>
+              {/* 年份标记 */}
+              <div className="relative z-10 mb-8 flex justify-center">
+                <span className="rounded-full border border-border bg-bg-card px-6 py-2 text-h3 font-bold text-accent-gold">
+                  {year}
+                </span>
+              </div>
+
+              <div className="relative flex flex-col gap-8">
+                {yearEvents.map((ev, i) => (
+                  <div key={ev.id} className="relative flex justify-center">
+                    {/* 节点圆点 */}
+                    <span className="absolute left-1/2 top-6 z-10 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-accent-gold bg-bg-base" />
+                    <TimelineNode event={ev} side={i % 2 === 0 ? 'left' : 'right'} />
+                    <div className="w-[calc(50%-24px)]" />
+                  </div>
+                ))}
+              </div>
             </div>
+          ))}
 
-            <div className="relative flex flex-col gap-8">
-              {events.map((ev, i) => (
-                <div key={ev.id} className="relative flex justify-center">
-                  {/* 节点圆点 */}
-                  <span className="absolute left-1/2 top-6 z-10 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-accent-gold bg-bg-base" />
-                  <TimelineNode event={ev} side={i % 2 === 0 ? 'left' : 'right'} />
-                  <div className="w-[calc(50%-24px)]" />
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {yearGroups.size === 0 && (
-          <div className="py-16 text-center text-text-secondary">该分类下暂无时间线事件</div>
-        )}
-      </div>
+          {yearGroups.size === 0 && (
+            <div className="py-16 text-center text-text-secondary">该分类下暂无时间线事件</div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

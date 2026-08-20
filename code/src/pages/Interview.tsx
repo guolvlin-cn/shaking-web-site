@@ -1,6 +1,16 @@
 import { useMemo, useState } from 'react';
 import { ExternalLink, Quote } from 'lucide-react';
-import { INTERVIEWS, INTERVIEW_FILTERS, QUOTES, type InterviewItem } from '../data/interview';
+import type { InterviewItem, Quote as QuoteType } from '@shared/types';
+import { useInterviews } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
+
+const INTERVIEW_FILTERS: Array<{ key: string; label: string }> = [
+  { key: '全部', label: '全部' },
+  { key: '视频专访', label: '视频专访' },
+  { key: '文字专访', label: '文字专访' },
+  { key: '杂志', label: '杂志' },
+  { key: '电台', label: '电台' },
+];
 
 const FORMAT_COLORS: Record<string, string> = {
   视频专访: 'bg-[#4834d4]',
@@ -50,11 +60,27 @@ function InterviewCard({ item }: { item: InterviewItem }) {
 
 export default function Interview() {
   const [filter, setFilter] = useState('全部');
+  const { data: interviews = [], isLoading, isError, refetch } = useInterviews();
 
   const filtered = useMemo(() => {
-    if (filter === '全部') return INTERVIEWS;
-    return INTERVIEWS.filter((i) => i.format === filter);
-  }, [filter]);
+    if (filter === '全部') return interviews;
+    return interviews.filter((i) => i.format === filter);
+  }, [interviews, filter]);
+
+  // 精彩语录来自后端（interviews 表 quotes 字段），按来源去重
+  const quotes = useMemo<QuoteType[]>(() => {
+    const seen = new Set<string>();
+    const result: QuoteType[] = [];
+    for (const item of interviews) {
+      for (const q of item.quotes ?? []) {
+        if (q.source && !seen.has(q.source)) {
+          seen.add(q.source);
+          result.push(q);
+        }
+      }
+    }
+    return result;
+  }, [interviews]);
 
   return (
     <div className="mx-auto max-w-[900px] px-4 py-12 md:px-8" data-testid="page-interview">
@@ -85,30 +111,38 @@ export default function Interview() {
         ))}
       </div>
 
-      <div className="mt-8 flex flex-col gap-4">
-        {filtered.map((item) => (
-          <InterviewCard key={item.id} item={item} />
-        ))}
-      </div>
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : (
+        <>
+          <div className="mt-8 flex flex-col gap-4">
+            {filtered.map((item) => (
+              <InterviewCard key={item.id} item={item} />
+            ))}
+          </div>
 
-      {filtered.length === 0 && (
-        <div className="py-16 text-center text-text-secondary">该分类下暂无采访内容</div>
-      )}
+          {filtered.length === 0 && (
+            <div className="py-16 text-center text-text-secondary">该分类下暂无采访内容</div>
+          )}
 
-      {/* 精彩语录 */}
-      {filter === '全部' && (
-        <div className="mt-12 space-y-4">
-          {QUOTES.map((q) => (
-            <blockquote
-              key={q.source}
-              className="rounded-card border border-accent-gold/20 bg-accent-gold/5 p-8 text-center"
-            >
-              <Quote size={40} className="mx-auto text-accent-gold" aria-hidden="true" />
-              <p className="mt-2 text-h3 font-medium text-text-primary">"{q.text}"</p>
-              <footer className="mt-3 text-caption text-text-secondary">— {q.source}</footer>
-            </blockquote>
-          ))}
-        </div>
+          {/* 精彩语录 */}
+          {filter === '全部' && quotes.length > 0 && (
+            <div className="mt-12 space-y-4">
+              {quotes.map((q) => (
+                <blockquote
+                  key={q.source}
+                  className="rounded-card border border-accent-gold/20 bg-accent-gold/5 p-8 text-center"
+                >
+                  <Quote size={40} className="mx-auto text-accent-gold" aria-hidden="true" />
+                  <p className="mt-2 text-h3 font-medium text-text-primary">"{q.text}"</p>
+                  <footer className="mt-3 text-caption text-text-secondary">— {q.source}</footer>
+                </blockquote>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

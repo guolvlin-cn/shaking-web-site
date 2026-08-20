@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import MusicPage from './Music';
 import { MUSIC_WORKS } from '../data/music';
+
+vi.mock('../hooks/useContentQueries', () => ({
+  useMusic: () => ({ data: MUSIC_WORKS, isLoading: false, isError: false, refetch: vi.fn() }),
+}));
 
 function renderMusic() {
   return render(

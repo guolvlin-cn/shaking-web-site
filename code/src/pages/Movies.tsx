@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { WORKS, type Work } from '../data/works';
+import type { Work } from '@shared/types';
+import { useWorks } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
 import WorkCard from '../components/common/WorkCard';
 import WorkModal from '../components/common/WorkModal';
 
@@ -16,9 +18,10 @@ export default function Movies() {
   const [typeTab, setTypeTab] = useState('全部');
   const [statusTab, setStatusTab] = useState('全部');
   const [selected, setSelected] = useState<Work | null>(null);
+  const { data: works = [], isLoading, isError, refetch } = useWorks();
 
   const filtered = useMemo(() => {
-    let list = WORKS.filter((w) => w.isPublished && (w.type === '电视剧' || w.type === '电影'));
+    let list = works.filter((w) => w.type === '电视剧' || w.type === '电影');
     if (typeTab !== '全部') {
       list = list.filter((w) => w.type === typeTab);
     }
@@ -26,7 +29,7 @@ export default function Movies() {
       list = list.filter((w) => w.status === statusTab);
     }
     return list.sort((a, b) => (b.releaseDate ?? '').localeCompare(a.releaseDate ?? ''));
-  }, [typeTab, statusTab]);
+  }, [works, typeTab, statusTab]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 py-12 md:px-8" data-testid="page-movies">
@@ -79,7 +82,11 @@ export default function Movies() {
       </div>
 
       {/* 网格 */}
-      {filtered.length > 0 ? (
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : filtered.length > 0 ? (
         <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
           {filtered.map((work) => (
             <WorkCard key={work.id} work={work} showStatus onView={setSelected} />

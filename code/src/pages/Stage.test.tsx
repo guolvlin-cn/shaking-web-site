@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Stage from './Stage';
 import { STAGE_EVENTS } from '../data/stage';
+
+vi.mock('../hooks/useContentQueries', () => ({
+  useStage: () => ({ data: STAGE_EVENTS, isLoading: false, isError: false, refetch: vi.fn() }),
+}));
 
 function renderStage() {
   return render(

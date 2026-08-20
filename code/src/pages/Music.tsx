@@ -1,6 +1,16 @@
 import { useMemo, useState } from 'react';
 import { Play, ChevronLeft, ChevronRight } from 'lucide-react';
-import { MUSIC_WORKS, MUSIC_FILTERS, type MusicWork } from '../data/music';
+import type { MusicWork } from '@shared/types';
+import { useMusic } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
+
+const MUSIC_FILTERS: Array<{ key: string; label: string }> = [
+  { key: '全部', label: '全部' },
+  { key: '原创单曲', label: '原创单曲' },
+  { key: '合作曲', label: '合作曲' },
+  { key: 'THE9时期', label: 'THE9时期' },
+  { key: '舞台Live', label: '舞台Live' },
+];
 
 const MUSIC_TAG_COLORS: Record<string, string> = {
   原创: 'bg-[#ff6b6b]',
@@ -52,7 +62,7 @@ function MusicCard({ work }: { work: MusicWork }) {
           <p className="mt-0.5 text-caption text-text-secondary">{work.releaseDate}</p>
         )}
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {work.tags.map((t) => (
+          {(work.tags ?? []).map((t) => (
             <span
               key={t}
               className={`rounded px-1.5 py-0.5 text-caption text-white ${
@@ -70,16 +80,17 @@ function MusicCard({ work }: { work: MusicWork }) {
 
 export default function MusicPage() {
   const [filter, setFilter] = useState('全部');
+  const { data: musicWorks = [], isLoading, isError, refetch } = useMusic();
 
   const filtered = useMemo(() => {
     if (filter === '全部') {
       // THE9 时期作品在下方特殊区块展示，主网格排除
-      return MUSIC_WORKS.filter((w) => w.category !== 'THE9时期');
+      return musicWorks.filter((w) => w.category !== 'THE9时期');
     }
-    return MUSIC_WORKS.filter((w) => w.category === filter);
-  }, [filter]);
+    return musicWorks.filter((w) => w.category === filter);
+  }, [musicWorks, filter]);
 
-  const the9Works = useMemo(() => MUSIC_WORKS.filter((w) => w.category === 'THE9时期'), []);
+  const the9Works = useMemo(() => musicWorks.filter((w) => w.category === 'THE9时期'), [musicWorks]);
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-12 md:px-8" data-testid="page-music">
@@ -112,44 +123,52 @@ export default function MusicPage() {
       </div>
 
       {/* 网格 */}
-      <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {filtered.map((work) => (
-          <MusicCard key={work.id} work={work} />
-        ))}
-      </div>
-
-      {/* THE9 时期特殊区块 */}
-      {filter === '全部' && the9Works.length > 0 && (
-        <div className="mt-12 rounded-card border border-accent-gold/40 bg-bg-card p-6">
-          <div className="flex items-center justify-between">
-            <h2 className="section-title">THE9 时期作品</h2>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                aria-label="向左滚动"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-text-secondary transition-colors hover:border-accent-gold hover:text-accent-gold"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                type="button"
-                aria-label="向右滚动"
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-text-secondary transition-colors hover:border-accent-gold hover:text-accent-gold"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {the9Works.map((work) => (
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : (
+        <>
+          <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {filtered.map((work) => (
               <MusicCard key={work.id} work={work} />
             ))}
           </div>
-        </div>
-      )}
 
-      {filtered.length === 0 && (
-        <div className="py-16 text-center text-text-secondary">该分类下暂无音乐作品</div>
+          {/* THE9 时期特殊区块 */}
+          {filter === '全部' && the9Works.length > 0 && (
+            <div className="mt-12 rounded-card border border-accent-gold/40 bg-bg-card p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="section-title">THE9 时期作品</h2>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    aria-label="向左滚动"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-text-secondary transition-colors hover:border-accent-gold hover:text-accent-gold"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="向右滚动"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border text-text-secondary transition-colors hover:border-accent-gold hover:text-accent-gold"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {the9Works.map((work) => (
+                  <MusicCard key={work.id} work={work} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {filtered.length === 0 && (
+            <div className="py-16 text-center text-text-secondary">该分类下暂无音乐作品</div>
+          )}
+        </>
       )}
     </div>
   );

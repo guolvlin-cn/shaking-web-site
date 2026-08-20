@@ -1,6 +1,16 @@
 import { useMemo, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
-import { VARIETY_SHOWS, VARIETY_FILTERS, type VarietyShow } from '../data/variety';
+import type { VarietyShow } from '@shared/types';
+import { useVariety } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
+
+const VARIETY_FILTERS: Array<{ key: string; label: string }> = [
+  { key: '全部', label: '全部' },
+  { key: '选秀', label: '选秀' },
+  { key: '真人秀', label: '真人秀' },
+  { key: '音综', label: '音综' },
+  { key: '晚会', label: '晚会' },
+];
 
 const CATEGORY_COLORS: Record<string, string> = {
   选秀: 'bg-[#ff9f43]',
@@ -55,11 +65,12 @@ function VarietyCard({ show }: { show: VarietyShow }) {
 
 export default function Variety() {
   const [filter, setFilter] = useState('全部');
+  const { data: shows = [], isLoading, isError, refetch } = useVariety();
 
   const filtered = useMemo(() => {
-    if (filter === '全部') return VARIETY_SHOWS;
-    return VARIETY_SHOWS.filter((s) => s.category === filter);
-  }, [filter]);
+    if (filter === '全部') return shows;
+    return shows.filter((s) => s.category === filter);
+  }, [shows, filter]);
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-12 md:px-8" data-testid="page-variety">
@@ -90,14 +101,22 @@ export default function Variety() {
         ))}
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((show) => (
-          <VarietyCard key={show.id} show={show} />
-        ))}
-      </div>
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : (
+        <>
+          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((show) => (
+              <VarietyCard key={show.id} show={show} />
+            ))}
+          </div>
 
-      {filtered.length === 0 && (
-        <div className="py-16 text-center text-text-secondary">该分类下暂无综艺节目</div>
+          {filtered.length === 0 && (
+            <div className="py-16 text-center text-text-secondary">该分类下暂无综艺节目</div>
+          )}
+        </>
       )}
     </div>
   );

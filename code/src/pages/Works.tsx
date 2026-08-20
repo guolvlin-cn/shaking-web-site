@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
-import { WORKS, type Work } from '../data/works';
+import type { Work } from '@shared/types';
+import { useWorks } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
 import WorkCard from '../components/common/WorkCard';
 import WorkModal from '../components/common/WorkModal';
 
@@ -26,6 +28,7 @@ export default function Works() {
   const [keyword, setKeyword] = useState('');
   const [selected, setSelected] = useState<Work | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const { data: works = [], isLoading, isError, refetch } = useWorks();
 
   // Ctrl+K 聚焦搜索
   useEffect(() => {
@@ -40,7 +43,7 @@ export default function Works() {
   }, []);
 
   const filtered = useMemo(() => {
-    let list = WORKS.filter((w) => w.isPublished);
+    let list = works; // API 仅返回已发布作品
     if (activeTab !== '全部') {
       const types = TYPE_MAP[activeTab] ?? [];
       list = list.filter((w) => types.includes(w.type));
@@ -56,7 +59,7 @@ export default function Works() {
       );
     }
     return list;
-  }, [activeTab, keyword]);
+  }, [works, activeTab, keyword]);
 
   return (
     <div className="mx-auto max-w-[1280px] px-4 py-12 md:px-8" data-testid="page-works">
@@ -108,7 +111,11 @@ export default function Works() {
       </div>
 
       {/* 卡片网格 */}
-      {filtered.length > 0 ? (
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : filtered.length > 0 ? (
         <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
           {filtered.map((work) => (
             <WorkCard key={work.id} work={work} showStatus onView={setSelected} />

@@ -1,19 +1,24 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LayoutGrid, Rows } from 'lucide-react';
-import { PHOTOS, ALBUM_FILTERS, type AlbumFilter } from '../data/photos';
+import type { PhotoAlbum } from '@shared/types';
+import { usePhotos } from '../hooks/useContentQueries';
+import { ErrorState, LoadingState } from '../components/common/AsyncState';
 
 const PAGE_SIZE = 8;
 
+const ALBUM_FILTERS: Array<PhotoAlbum | '全部'> = ['全部', '舞台照', '写真', '路透', '饭拍'];
+
 export default function Gallery() {
-  const [album, setAlbum] = useState<AlbumFilter>('全部');
+  const [album, setAlbum] = useState<PhotoAlbum | '全部'>('全部');
   const [mode, setMode] = useState<'masonry' | 'grid'>('masonry');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const loaderRef = useRef<HTMLDivElement>(null);
+  const { data: photos = [], isLoading, isError, refetch } = usePhotos();
 
   const filtered = useMemo(
-    () => (album === '全部' ? PHOTOS : PHOTOS.filter((p) => p.album === album)),
-    [album],
+    () => (album === '全部' ? photos : photos.filter((p) => p.album === album)),
+    [photos, album],
   );
 
   const visible = filtered.slice(0, visibleCount);
@@ -126,47 +131,55 @@ export default function Gallery() {
       </div>
 
       {/* 图片列表 */}
-      <div
-        className={
-          mode === 'grid'
-            ? 'mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4'
-            : 'mt-8 columns-2 gap-3 md:columns-3 md:gap-4 lg:columns-4 [&>*]:mb-3 md:[&>*]:mb-4'
-        }
-      >
-        {visible.map((photo, i) => (
-          <button
-            key={photo.id}
-            type="button"
-            onClick={() => openPhoto(i)}
-            className="group relative block w-full overflow-hidden rounded-card border border-border bg-bg-card text-left transition-all duration-300 hover:border-accent-gold"
-            data-testid={`gallery-photo-${photo.id}`}
-          >
-            <div
-              className="w-full aspect-[3/4]"
-              style={{ background: photo.gradient }}
-              role="img"
-              aria-label={photo.title}
-            >
-              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
-                <div>
-                  <div className="text-sm font-medium text-white">{photo.title}</div>
-                  <div className="text-caption text-white/70">{photo.album}</div>
-                </div>
-              </div>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* 加载指示器 */}
-      {hasMore ? (
-        <div ref={loaderRef} className="py-8 text-center text-text-secondary" data-testid="gallery-loader">
-          加载中…
-        </div>
+      {isLoading ? (
+        <LoadingState />
+      ) : isError ? (
+        <ErrorState onRetry={() => refetch()} />
       ) : (
-        <div className="py-8 text-center text-caption text-text-secondary" data-testid="gallery-end">
-          已加载全部图片（{filtered.length} 张）
-        </div>
+        <>
+          <div
+            className={
+              mode === 'grid'
+                ? 'mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4'
+                : 'mt-8 columns-2 gap-3 md:columns-3 md:gap-4 lg:columns-4 [&>*]:mb-3 md:[&>*]:mb-4'
+            }
+          >
+            {visible.map((photo, i) => (
+              <button
+                key={photo.id}
+                type="button"
+                onClick={() => openPhoto(i)}
+                className="group relative block w-full overflow-hidden rounded-card border border-border bg-bg-card text-left transition-all duration-300 hover:border-accent-gold"
+                data-testid={`gallery-photo-${photo.id}`}
+              >
+                <div
+                  className="w-full aspect-[3/4]"
+                  style={{ background: photo.gradient }}
+                  role="img"
+                  aria-label={photo.title}
+                >
+                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+                    <div>
+                      <div className="text-sm font-medium text-white">{photo.title}</div>
+                      <div className="text-caption text-white/70">{photo.album}</div>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* 加载指示器 */}
+          {hasMore ? (
+            <div ref={loaderRef} className="py-8 text-center text-text-secondary" data-testid="gallery-loader">
+              加载中…
+            </div>
+          ) : (
+            <div className="py-8 text-center text-caption text-text-secondary" data-testid="gallery-end">
+              已加载全部图片（{filtered.length} 张）
+            </div>
+          )}
+        </>
       )}
 
       {/* 灯箱 */}

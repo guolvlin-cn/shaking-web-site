@@ -1,7 +1,17 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import About from './About';
+import { SITE } from '../data/site';
+
+vi.mock('../hooks/useContentQueries', () => ({
+  useSiteConfig: () => ({
+    data: { site: SITE, socialLinks: [], heroSlides: [], quickJumpSections: [], announcement: '' },
+    isLoading: false,
+    isError: false,
+    refetch: vi.fn(),
+  }),
+}));
 
 function renderAbout() {
   return render(

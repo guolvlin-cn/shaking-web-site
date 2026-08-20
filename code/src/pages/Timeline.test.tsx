@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TimelinePage from './Timeline';
 import { TIMELINE_EVENTS } from '../data/timeline';
+
+vi.mock('../hooks/useContentQueries', () => ({
+  useTimeline: () => ({ data: TIMELINE_EVENTS, isLoading: false, isError: false, refetch: vi.fn() }),
+}));
 
 function renderTimeline() {
   return render(
